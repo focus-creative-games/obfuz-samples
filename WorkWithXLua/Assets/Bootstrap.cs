@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using Obfuz;
 using Obfuz.EncryptionVM;
 using System.Collections;
