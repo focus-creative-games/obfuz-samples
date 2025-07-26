@@ -19,13 +19,15 @@ MonoBehaviour:
     - HotUpdate
     nonObfuscatedButReferencingObfuscatedAssemblies: []
     additionalAssemblySearchPaths: []
+    obfuscateObfuzRuntime: 1
   obfuscationPassSettings:
     enabledPasses: -1
     ruleFiles: []
   secretSettings:
     defaultStaticSecretKey: Code Philosophy-Static
     defaultDynamicSecretKey: Code Philosophy-Dynamic
-    secretKeyOutputPath: Assets/Resources/Obfuz
+    staticSecretKeyOutputPath: Assets/Resources/Obfuz/defaultStaticSecretKey.bytes
+    dynamicSecretKeyOutputPath: Assets/Resources/Obfuz/defaultDynamicSecretKey.bytes
     randomSeed: 0
     assembliesUsingDynamicSecretKeys: []
   encryptionVMSettings:
@@ -36,8 +38,11 @@ MonoBehaviour:
     debug: 0
     obfuscatedNamePrefix: $
     useConsistentNamespaceObfuscation: 1
+    keepUnknownSymbolInSymbolMappingFile: 1
     symbolMappingFile: Assets/Obfuz/SymbolObfus/symbol-mapping.xml
+    debugSymbolMappingFile: Assets/Obfuz/SymbolObfus/symbol-mapping-debug.xml
     ruleFiles: []
+    customRenamePolicyTypes: []
   constEncryptSettings:
     encryptionLevel: 1
     ruleFiles: []
@@ -46,4 +51,5 @@ MonoBehaviour:
     ruleFiles: []
   callObfusSettings:
     obfuscationLevel: 1
+    maxProxyMethodCountPerDispatchMethod: 100
     ruleFiles: []
