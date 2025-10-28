@@ -1,3 +1,4 @@
+using HybridCLR;
 using Obfuz;
 using Obfuz.EncryptionVM;
 using System;
@@ -28,9 +29,22 @@ public class Bootstrap : MonoBehaviour
 #if UNITY_EDITOR
         Assembly ass = AppDomain.CurrentDomain.GetAssemblies().First(ass => ass.GetName().Name == "HotUpdate");
 #else
+        LoadMetadataForAOTAssemblies();
         Assembly ass = Assembly.Load(File.ReadAllBytes($"{Application.streamingAssetsPath}/HotUpdate.dll.bytes"));
 #endif
         Type entry = ass.GetType("Entry");
         this.gameObject.AddComponent(entry);
+    }
+
+    private static void LoadMetadataForAOTAssemblies()
+    {
+        HomologousImageMode mode = HomologousImageMode.SuperSet;
+        var aotDlls = new string[] { "mscorlib" };
+        foreach (var aotDllName in aotDlls)
+        {
+            byte[] dllBytes = File.ReadAllBytes($"{Application.streamingAssetsPath}/{aotDllName}.dll.bytes");
+            LoadImageErrorCode err = RuntimeApi.LoadMetadataForAOTAssembly(dllBytes, mode);
+            Debug.Log($"LoadMetadataForAOTAssembly:{aotDllName}. mode:{mode} ret:{err}");
+        }
     }
 }

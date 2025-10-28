@@ -24,16 +24,53 @@ public static class BuildCommand
         string hotUpdateDllPath = $"{SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target)}";
         List<string> obfuscationRelativeAssemblyNames = ObfuzSettings.Instance.assemblySettings.GetObfuscationRelativeAssemblyNames();
 
-        foreach (string assName in SettingsUtil.HotUpdateAssemblyNamesIncludePreserved)
+        if (ObfuzSettings.Instance.polymorphicDllSettings.enable)
         {
-            string srcDir = obfuscationRelativeAssemblyNames.Contains(assName) ? obfuscatedHotUpdateDllPath : hotUpdateDllPath;
-            string srcFile = $"{srcDir}/{assName}.dll";
-            string dstFile = $"{Application.streamingAssetsPath}/{assName}.dll.bytes";
-            if (File.Exists(srcFile))
             {
-                File.Copy(srcFile, dstFile, true);
-                Debug.Log($"[CompileAndObfuscate] Copy {srcFile} to {dstFile}");
+                string inputDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
+                string oldDll = $"{inputDir}/mscorlib.dll";
+                string newDll = $"{Application.streamingAssetsPath}/mscorlib.dll.bytes";
+                ObfuscateUtil.GeneratePolymorphicDll(oldDll, newDll);
             }
+            {
+                string intpuDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
+                string oldDll = $"{intpuDir}/HotUpdate.dll";
+                string newDll = $"{Application.streamingAssetsPath}/HotUpdate.dll.bytes";
+                ObfuscateUtil.GeneratePolymorphicDll(oldDll, newDll);
+            }
+        }
+        else
+        {
+            foreach (string assName in SettingsUtil.HotUpdateAssemblyNamesIncludePreserved)
+            {
+                string srcDir = obfuscationRelativeAssemblyNames.Contains(assName) ? obfuscatedHotUpdateDllPath : hotUpdateDllPath;
+                string srcFile = $"{srcDir}/{assName}.dll";
+                string dstFile = $"{Application.streamingAssetsPath}/{assName}.dll.bytes";
+                if (File.Exists(srcFile))
+                {
+                    File.Copy(srcFile, dstFile, true);
+                    Debug.Log($"[CompileAndObfuscate] Copy {srcFile} to {dstFile}");
+                }
+            }
+
+        }
+    }
+
+    [MenuItem("Build/TestGenPolymorphicDlls")]
+    public static void TestGenPolymorphicDlls()
+    {
+        BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+        {
+            string inputDir = SettingsUtil.GetAssembliesPostIl2CppStripDir(target);
+            string oldDll = $"{inputDir}/mscorlib.dll";
+            string newDll = $"{inputDir}/mscorlib.dll.bytes";
+            ObfuscateUtil.GeneratePolymorphicDll(oldDll, newDll);
+        }
+        {
+            string intpuDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);
+            string oldDll = $"{intpuDir}/HotUpdate.dll";
+            string newDll = $"{intpuDir}/HotUpdate.dll.bytes";
+            ObfuscateUtil.GeneratePolymorphicDll(oldDll, newDll);
         }
     }
 }
